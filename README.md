@@ -7,14 +7,14 @@ It's React component which support content editable div
 ## Install
 
 ```sh
-npm install react-content-editable
+npm install reactjs-content-editable
 ```
 
 ## Usage
 
 ```javascript
 import React, { useState } from 'react';
-import { ContentEditable } from "react-content-editable";
+import { ContentEditable } from "reactjs-content-editable";
 
 function App() {
   const [html, setHtml] = useState("")

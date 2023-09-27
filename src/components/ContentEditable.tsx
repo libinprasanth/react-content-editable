@@ -6,7 +6,7 @@ export type ContentEditableProps = {
   className?: string
   style?: React.CSSProperties
   innerRef?: React.LegacyRef<HTMLDivElement> | React.RefObject<HTMLDivElement> | string | null
-  onChange: Function
+  onChange: any
 }
 
 /**
@@ -23,24 +23,18 @@ const ContentEditable = ({
   innerRef,
   onChange,
 }: ContentEditableProps) => {
+  const [content, setContent] = React.useState(html)
   const contentRef = React.useRef<HTMLDivElement>(null)
   const ref = typeof innerRef === 'string' ? undefined : (innerRef as React.RefObject<HTMLDivElement>) || contentRef
 
-  React.useEffect(() => {
-    // Save the selection before re-render
-    const selection = window.getSelection()
-    if (selection) {
-      const range = selection.getRangeAt(0)
-      const startOffset = range.startOffset
+  const normalizeHtml = (str: string) => {
+    return str && str.replace(/&nbsp;|\u202F|\u00A0/g, ' ').replace(/<br \/>/g, '<br>')
+  }
 
-      // Restore the selection after re-render
-      if (ref && ref.current && ref.current.textContent && startOffset <= ref.current.textContent.length) {
-        const newRange = document.createRange()
-        newRange.setStart(ref.current.firstChild || ref.current, startOffset)
-        newRange.collapse(true)
-        selection.removeAllRanges()
-        selection.addRange(newRange)
-      }
+  React.useEffect(() => {
+    const currentHtml = ref && ref?.current?.innerHTML
+    if (normalizeHtml(html) != normalizeHtml(currentHtml || '')) {
+      setContent(html)
     }
   }, [html])
 
@@ -61,7 +55,7 @@ const ContentEditable = ({
       onKeyUp={emitChange}
       onKeyDown={emitChange}
       contentEditable={!disabled}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: content }}
     />
   )
 }
